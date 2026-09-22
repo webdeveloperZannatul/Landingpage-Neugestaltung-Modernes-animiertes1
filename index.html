@@ -1,0 +1,1242 @@
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>X1 Quiz Show</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #050510;
+            --bg-tertiary: #0a0a1a;
+            --accent-cyan: #00d4ff;
+            --accent-blue: #0066ff;
+            --accent-glow: rgba(0, 212, 255, 0.3);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-muted: rgba(255, 255, 255, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        .font-display {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-cyan);
+            border-radius: 4px;
+        }
+
+        /* Glow effects */
+        .glow-text {
+            text-shadow: 0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow);
+        }
+
+        .glow-box {
+            box-shadow: 0 0 60px var(--accent-glow), inset 0 0 60px rgba(0, 212, 255, 0.05);
+        }
+
+        /* Gradient overlays */
+        .gradient-overlay {
+            background: linear-gradient(180deg, 
+                rgba(0,0,0,0.8) 0%, 
+                rgba(0,0,0,0.4) 40%,
+                rgba(0,0,0,0.8) 100%);
+        }
+
+        .gradient-radial {
+            background: radial-gradient(ellipse at center, 
+                rgba(0, 102, 255, 0.15) 0%, 
+                transparent 70%);
+        }
+
+        /* Button styles */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+            color: #000;
+            font-weight: 700;
+            padding: 18px 48px;
+            border-radius: 60px;
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-primary);
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 16px 40px;
+            border-radius: 60px;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        /* Navigation */
+        .nav-link {
+            position: relative;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent-cyan);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Reveal animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        /* Video container */
+        .video-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            padding: 2px;
+            background: linear-gradient(135deg, var(--accent-cyan), transparent, var(--accent-blue));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .play-button {
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 212, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .play-button:hover {
+            background: var(--accent-cyan);
+            transform: scale(1.1);
+            box-shadow: 0 0 60px var(--accent-glow);
+        }
+
+        .play-button:hover svg {
+            fill: #000;
+        }
+
+        /* FAQ Accordion */
+        .faq-item {
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 24px 0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--accent-cyan);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            color: var(--text-secondary);
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 300px;
+            padding-bottom: 24px;
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+        }
+
+        /* Testimonial Carousel */
+        .testimonial-track {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 0 20px;
+        }
+
+        /* Steps */
+        .step-number {
+            font-size: clamp(120px, 15vw, 200px);
+            font-weight: 900;
+            color: transparent;
+            -webkit-text-stroke: 2px rgba(0, 212, 255, 0.3);
+            line-height: 1;
+            transition: all 0.4s ease;
+        }
+
+        .step-card:hover .step-number {
+            -webkit-text-stroke: 2px var(--accent-cyan);
+            color: rgba(0, 212, 255, 0.1);
+        }
+
+        /* Parallax */
+        .parallax-slow {
+            will-change: transform;
+        }
+
+        /* Mobile menu */
+        .mobile-menu {
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .mobile-menu.active {
+            transform: translateX(0);
+        }
+
+        /* Image treatments */
+        .img-premium {
+            filter: contrast(1.05) saturate(1.1);
+            transition: all 0.6s ease;
+        }
+
+        .img-premium:hover {
+            transform: scale(1.02);
+            filter: contrast(1.1) saturate(1.2);
+        }
+
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Pulse glow */
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="flex items-center justify-between h-20">
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-3">
+                <img style="width:120px; height: 28px;"src="https://i.ibb.co.com/mFqSP1hv/X1-Logo-Weiss-Transparent.png">
+            </a>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-10">
+                <a href="#experience" class="nav-link text-sm font-medium tracking-wide">ERLEBNIS</a>
+                <a href="#benefits" class="nav-link text-sm font-medium tracking-wide">VORTEILE</a>
+                <a href="#steps" class="nav-link text-sm font-medium tracking-wide">MITMACHEN</a>
+                <a href="#faq" class="nav-link text-sm font-medium tracking-wide">FAQ</a>
+            </div>
+
+            <!-- CTA -->
+            <div class="hidden md:block">
+                <button class="btn-primary text-sm" onclick="scrollToSection('tickets')">Ticket sichern</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="md:hidden w-10 h-10 flex flex-col justify-center items-center gap-1.5" onclick="toggleMobileMenu()" aria-label="Menü öffnen">
+                <span class="w-6 h-0.5 bg-white transition-all duration-300" id="hamburger-top"></span>
+                <span class="w-6 h-0.5 bg-white transition-all duration-300" id="hamburger-mid"></span>
+                <span class="w-6 h-0.5 bg-white transition-all duration-300" id="hamburger-bot"></span>
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu fixed inset-0 bg-black/95 backdrop-blur-xl z-40 md:hidden" id="mobileMenu">
+    <div class="flex flex-col items-center justify-center h-full gap-8">
+        <a href="#experience" class="text-2xl font-display font-semibold" onclick="toggleMobileMenu()">Erlebnis</a>
+        <a href="#benefits" class="text-2xl font-display font-semibold" onclick="toggleMobileMenu()">Vorteile</a>
+        <a href="#steps" class="text-2xl font-display font-semibold" onclick="toggleMobileMenu()">Mitmachen</a>
+        <a href="#faq" class="text-2xl font-display font-semibold" onclick="toggleMobileMenu()">FAQ</a>
+        <button class="btn-primary mt-8" onclick="toggleMobileMenu(); scrollToSection('tickets')">Ticket sichern</button>
+    </div>
+</div>
+
+<!-- Hero Section -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <!-- Background Video/Image -->
+    <div class="absolute inset-0">
+        <video id="heroVideo" autoplay muted loop playsinline class="w-full h-full object-cover" poster="https://www.designarena.ai/u/5eea81ff-09f3-423e-8bbc-344118ca56ed">
+            <source src="https://www.designarena.ai/u/6cdd7a9f-2f80-494b-87b6-a587dcad65ad" type="video/mp4">
+        </video>
+        <div class="absolute inset-0 gradient-overlay"></div>
+        <div class="absolute inset-0 gradient-radial"></div>
+    </div>
+
+    <!-- Floating particles effect -->
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-60 float-animation" style="top: 20%; left: 15%; animation-delay: 0s;"></div>
+        <div class="absolute w-1.5 h-1.5 bg-blue-400 rounded-full opacity-40 float-animation" style="top: 60%; left: 85%; animation-delay: 1s;"></div>
+        <div class="absolute w-1 h-1 bg-cyan-300 rounded-full opacity-70 float-animation" style="top: 75%; left: 25%; animation-delay: 2s;"></div>
+        <div class="absolute w-3 h-3 bg-blue-500 rounded-full opacity-30 float-animation pulse-glow" style="top: 30%; left: 70%; animation-delay: 0.5s;"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 max-w-6xl mx-auto px-6 text-center pt-20">
+        <div class="reveal">
+            <p class="text-cyan-400 font-medium tracking-[0.3em] text-sm mb-6 uppercase">Live-Quiz-Erlebnis 2025</p>
+        </div>
+        
+        <h1 class="reveal reveal-delay-1 font-display font-bold leading-[0.95] mb-8" style="font-size: clamp(48px, 10vw, 120px);">
+            Wissen.<br>
+            <span class="glow-text" style="background: linear-gradient(135deg, #ffffff 0%, #00d4ff 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Gewinnen.</span><br>
+            Erleben.
+        </h1>
+        
+        <p class="reveal reveal-delay-2 text-xl md:text-2xl text-white/70 max-w-2xl mx-auto mb-12 font-light leading-relaxed">
+            X1 ist mehr als ein Quiz. Es ist eine Reise durch Wissenswelten – 
+            dramatisch inszeniert, mit Preisen, die verändern.
+        </p>
+        
+        <div class="reveal reveal-delay-3 flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button class="btn-primary" onclick="scrollToSection('tickets')">
+                Jetzt mitspielen
+                <svg class="inline-block ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                </svg>
+            </button>
+            <button class="btn-secondary" onclick="scrollToSection('trailer')">
+                Trailer ansehen
+            </button>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="reveal reveal-delay-4 absolute bottom-12 left-1/2 -translate-x-1/2">
+            <div class="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center pt-2">
+                <div class="w-1.5 h-3 bg-cyan-400 rounded-full animate-bounce"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Live Experience Section -->
+<section id="experience" class="relative py-32 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-transparent"></div>
+    
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+            <!-- Text Content -->
+            <div class="order-2 lg:order-1">
+                <p class="text-cyan-400 font-medium tracking-[0.2em] text-sm mb-4 reveal">DAS ERLEBNIS</p>
+                <h2 class="font-display font-bold text-4xl md:text-6xl mb-8 reveal reveal-delay-1 leading-tight">
+                    Ein Abend, der<br>
+                    <span style="color: var(--accent-cyan)">in Erinnerung bleibt</span>
+                </h2>
+                <p class="text-lg text-white/60 mb-8 reveal reveal-delay-2 leading-relaxed">
+                    Stellen Sie sich vor: Sie sitzen im Herzen einer Arena aus Licht und Sound. 
+                    Um Sie herum pulsierendes Blau, vor Ihnen das gigantische Bühnenset von X1. 
+                    Der Moderator betritt die Bühne – und das Rennen um den Jackpot beginnt.
+                </p>
+                
+                <div class="grid grid-cols-2 gap-8 reveal reveal-delay-3">
+                    <div>
+                        <p class="font-display font-bold text-4xl text-cyan-400">6</p>
+                        <p class="text-sm text-white/50 mt-1">Runden pro Abend</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-bold text-4xl text-cyan-400">50k+</p>
+                        <p class="text-sm text-white/50 mt-1">Euro Hauptpreis</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-bold text-4xl text-cyan-400">500</p>
+                        <p class="text-sm text-white/50 mt-1">Teilnehmer live</p>
+                    </div>
+                    <div>
+                        <p class="font-display font-bold text-4xl text-cyan-400">3h</p>
+                        <p class="text-sm text-white/50 mt-1">Pure Spannung</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Image -->
+            <div class="order-1 lg:order-2 reveal reveal-delay-2">
+                <div class="relative">
+                    <div class="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-3xl rounded-3xl"></div>
+                    <img src="https://www.designarena.ai/u/a631dfec-0b06-4e36-8b16-be7482e52687" 
+                         alt="X1 Live Event" 
+                         class="relative rounded-2xl img-premium w-full shadow-2xl">
+                    <div class="absolute bottom-6 left-6 right-6 bg-black/60 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                        <p class="text-sm text-cyan-400 font-medium">Nächster Termin</p>
+                        <p class="text-lg font-semibold mt-1">15. März 2025 · Berlin</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Benefits Section -->
+<section id="benefits" class="py-32 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="text-center max-w-3xl mx-auto mb-20">
+            <p class="text-cyan-400 font-medium tracking-[0.2em] text-sm mb-4 reveal">WARUM X1</p>
+            <h2 class="font-display font-bold text-4xl md:text-6xl reveal reveal-delay-1">
+                Mehr als nur Quiz
+            </h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <!-- Benefit 1 -->
+            <div class="group p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-cyan-500/30 transition-all duration-500 reveal reveal-delay-1">
+                <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:bg-cyan-500/20 transition-colors">
+                    <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-display font-semibold text-2xl mb-3">Epische Themenwelten</h3>
+                <p class="text-white/50 leading-relaxed">
+                    Von antiken Mythen bis zur Zukunftstechnologie – jede Runde ist eine eigene Geschichte.
+                </p>
+            </div>
+
+            <!-- Benefit 2 -->
+            <div class="group p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-cyan-500/30 transition-all duration-500 reveal reveal-delay-2">
+                <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:bg-cyan-500/20 transition-colors">
+                    <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-display font-semibold text-2xl mb-3">Lebensverändernde Preise</h3>
+                <p class="text-white/50 leading-relaxed">
+                    Der Hauptjackpot ist nur der Anfang. Jede Runde bietet zusätzliche Gewinnchancen.
+                </p>
+            </div>
+
+            <!-- Benefit 3 -->
+            <div class="group p-8 rounded-3xl bg-gradient-to-b from-white/5 to-transparent border border-white/5 hover:border-cyan-500/30 transition-all duration-500 reveal reveal-delay-3">
+                <div class="w-16 h-16 rounded-2xl bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:bg-cyan-500/20 transition-colors">
+                    <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                </div>
+                <h3 class="font-display font-semibold text-2xl mb-3">Community-Feeling</h3>
+                <p class="text-white/50 leading-relaxed">
+                    Treffen Sie Gleichgesinnte. Feiern Sie zusammen. Werden Sie Teil der X1-Familie.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 4 Steps Section -->
+<section id="steps" class="py-32 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-cyan-500/5 to-transparent"></div>
+    
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="text-center max-w-3xl mx-auto mb-20">
+            <p class="text-cyan-400 font-medium tracking-[0.2em] text-sm mb-4 reveal">SO FUNKTIONIERTS</p>
+            <h2 class="font-display font-bold text-4xl md:text-6xl reveal reveal-delay-1">
+                4 Schritte zum<br>Jackpot
+            </h2>
+        </div>
+
+        <div class="space-y-16">
+            <!-- Step 1 -->
+            <div class="step-card grid lg:grid-cols-12 gap-8 items-center reveal">
+                <div class="lg:col-span-2 flex justify-center lg:justify-end">
+                    <span class="step-number font-display">01</span>
+                </div>
+                <div class="lg:col-span-4">
+                    <h3 class="font-display font-semibold text-2xl md:text-3xl mb-3">Ticket sichern</h3>
+                    <p class="text-white/50 leading-relaxed">
+                        Wählen Sie Ihren Wunschtermin und sichern Sie Ihren Platz unter den 500 Teilnehmern des Abends.
+                    </p>
+                </div>
+                <div class="lg:col-span-6">
+                    <img src="https://www.designarena.ai/u/84936705-ff11-4f2b-afb7-74a5d2daff93" 
+                         alt="Ticket buchen" 
+                         class="rounded-2xl w-full img-premium shadow-xl">
+                </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="step-card grid lg:grid-cols-12 gap-8 items-center reveal">
+                <div class="lg:col-span-2 flex justify-center lg:justify-end order-1 lg:order-1">
+                    <span class="step-number font-display">02</span>
+                </div>
+                <div class="lg:col-span-4 order-3 lg:order-2">
+                    <h3 class="font-display font-semibold text-2xl md:text-3xl mb-3">Vorbereiten & entspannen</h3>
+                    <p class="text-white/50 leading-relaxed">
+                        Keine Vorkenntnisse nötig. Bringen Sie Neugier mit – wir kümmern uns um den Rest.
+                    </p>
+                </div>
+                <div class="lg:col-span-6 order-2 lg:order-3">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 blur-3xl rounded-3xl"></div>
+                        <div class="relative bg-gradient-to-br from-white/10 to-white/5 rounded-2xl p-8 border border-white/10 backdrop-blur-sm">
+                            <p class="text-4xl font-display font-bold text-cyan-400 mb-2">100%</p>
+                            <p class="text-white/60">der Teilnehmer empfehlen X1 weiter</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="step-card grid lg:grid-cols-12 gap-8 items-center reveal">
+                <div class="lg:col-span-2 flex justify-center lg:justify-end">
+                    <span class="step-number font-display">03</span>
+                </div>
+                <div class="lg:col-span-4">
+                    <h3 class="font-display font-semibold text-2xl md:text-3xl mb-3">Live mitspielen</h3>
+                    <p class="text-white/50 leading-relaxed">
+                        Antworten Sie auf die Fragen Ihres Moderators. Jede richtige Antwort bringt Sie näher ans Ziel.
+                    </p>
+                </div>
+                <div class="lg:col-span-6">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="aspect-square bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:border-cyan-500/30 transition-colors cursor-pointer">
+                            <span class="text-3xl font-display font-bold text-white/80">A</span>
+                        </div>
+                        <div class="aspect-square bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:border-cyan-500/30 transition-colors cursor-pointer">
+                            <span class="text-3xl font-display font-bold text-white/80">B</span>
+                        </div>
+                        <div class="aspect-square bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:border-cyan-500/30 transition-colors cursor-pointer">
+                            <span class="text-3xl font-display font-bold text-white/80">C</span>
+                        </div>
+                        <div class="aspect-square bg-white/5 rounded-xl flex items-center justify-center border border-white/10 hover:border-cyan-500/30 transition-colors cursor-pointer col-start-2">
+                            <span class="text-3xl font-display font-bold text-white/80">D</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="step-card grid lg:grid-cols-12 gap-8 items-center reveal">
+                <div class="lg:col-span-2 flex justify-center lg:justify-end">
+                    <span class="step-number font-display">04</span>
+                </div>
+                <div class="lg:col-span-4">
+                    <h3 class="font-display font-semibold text-2xl md:text-3xl mb-3">Gewinnen & feiern</h3>
+                    <p class="text-white/50 leading-relaxed">
+                        Der Gewinner nimmt den Jackpot mit nach Hause. Aber auch alle anderen gehen als Sieger hervor.
+                    </p>
+                </div>
+                <div class="lg:col-span-6">
+                    <div class="relative overflow-hidden rounded-2xl">
+                        <div class="absolute inset-0 bg-gradient-to-r from-yellow-500/20 via-cyan-500/20 to-yellow-500/20 animate-pulse"></div>
+                        <div class="relative bg-black/80 backdrop-blur-sm p-8 text-center border border-yellow-500/30">
+                            <p class="text-sm uppercase tracking-widest text-yellow-400 mb-2">Hauptpreis</p>
+                            <p class="font-display font-bold text-5xl md:text-6xl">50.000 EUR</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Video/Trailer Section -->
+<section id="trailer" class="py-32 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/10 to-transparent"></div>
+    
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <p class="text-cyan-400 font-medium tracking-[0.2em] text-sm mb-4 reveal">TRAILER</p>
+            <h2 class="font-display font-bold text-4xl md:text-6xl reveal reveal-delay-1">
+                Erleben Sie die<br>Atmosphäre
+            </h2>
+        </div>
+
+        <div class="video-container aspect-video reveal reveal-delay-2" id="trailerContainer">
+            <video id="trailerVideo" class="w-full h-full object-cover" poster="https://www.designarena.ai/u/5eea81ff-09f3-423e-8bbc-344118ca56ed">
+                <source src="https://www.designarena.ai/u/6cdd7a9f-2f80-494b-87b6-a587dcad65ad" type="video/mp4">
+            </video>
+            
+            <!-- Play Button Overlay -->
+            <div class="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity duration-500" id="playOverlay">
+                <button class="play-button" onclick="toggleTrailer()" aria-label="Video abspielen">
+                    <svg class="w-10 h-10 ml-1" fill="white" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Video Controls -->
+            <div class="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent opacity-0 transition-opacity duration-300" id="videoControls">
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleTrailer()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+                        <svg class="w-5 h-5" fill="white" viewBox="0 0 24 24" id="playPauseIcon">
+                            <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                        </svg>
+                    </button>
+                    <div class="flex-1 h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer" onclick="seekVideo(event)">
+                        <div class="h-full bg-cyan-400 rounded-full transition-all duration-100" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <span class="text-sm text-white/70" id="timeDisplay">0:00 / 0:00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-32 relative overflow-hidden">
+    <div class="max-w-6xl mx-auto px-6 lg:px-12">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <p class="text-cyan-400 font-medium tracking-[0.2em] text-sm mb-4 reveal">STIMMEN</p>
+            <h2 class="font-display font-bold text-4xl md:text-6xl reveal reveal-delay-1">
+                Was unsere Gäste sagen
+            </h2>
+        </div>
+
+        <div class="relative overflow-hidden reveal reveal-delay-2">
+            <div class="testimonial-track" id="testimonialTrack">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-slide">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <div class="flex justify-center gap-1 mb-8">
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <blockquote class="text-2xl md:text-3xl font-light leading-relaxed mb-8 text-white/90">
+                            "Das war der aufregendste Abend meines Jahres. Die Produktion ist 
+                            <span class="text-cinema-foreground">kinoreif</span>, und die Atmosphäre ist einfach unglaublich."
+                        </blockquote>
+                        <div>
+                            <p class="font-semibold text-lg">Maria Schmidt</p>
+                            <p class="text-white/50">Teilnehmerin, Berlin</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="testimonial-slide">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <div class="flex justify-center gap-1 mb-8">
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <blockquote class="text-2xl md:text-3xl font-light leading-relaxed mb-8 text-white/90">
+                            "Ich habe zwar nicht den Hauptpreis gewonnen, aber der Abend hat sich 
+                            <span class="text-cyan-400">jeden Cent wert</span> gewesen. Unvergesslich!"
+                        </blockquote>
+                        <div>
+                            <p class="font-semibold text-lg">Thomas Weber</p>
+                            <p class="text-white/50">Teilnehmer, München</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="testimonial-slide">
+                    <div class="max-w-4xl mx-auto text-center">
+                        <div class="flex justify-center gap-1 mb-8">
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                            <svg class="w-6 h-6 text-cyan-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        </div>
+                        <blockquote class="text-2xl md:text-3xl font-light leading-relaxed mb-8 text-white/90">
+                            "Professionell bis ins letzte Detail. Das Team von X1 weiß, wie man 
+                            <span class="text-cyan-400">Spannung aufbaut</span>. Absolut empfehlenswert!"
+                        </blockquote>
+                        <div>
+                            <p class="font-semibold text-lg">Laura Fischer</p>
+                            <p class="text-white/50">Teilnehmerin, Hamburg</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Carousel Controls -->
+            <div class="flex justify-center items-center gap-6 mt-12">
+                <button onclick="prevTestimonial()" class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:border-cyan-400 hover:text-cyan-400 transition-all" aria-label="Vorheriges Testimonail">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                </button>
+                <div class="flex gap-2" id="carouselDots">
+                    <button class="w-2.5 h-2.5 rounded-full bg-cyan-400 transition-all" data-index="0" aria-label="Testimonial 1"></button>
+                    <button class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all" data-index="1" aria-label="Testimonial 2"></button>
+                    <button class="w-2.5 h-2.5 rounded-full bg-white/30 transition-all" data-index="2" aria-label="Testimonial 3"></button>
+                </div>
+                <button onclick="nextTestimonial()" class="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center hover:border-cyan-400 hover:text-cyan-400 transition-all" aria-label="Nächstes Testimonail">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-32 relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/5 to-transparent"></div>
+    
+    <div class="max-w-3xl mx-auto px-6 lg:px-12">
+        <div class="text-center mb-16">
+            <p class="text-cyan-400 font-medium tracking-[0.2em] text-sm mb-4 reveal">FRAGEN</p>
+            <h2 class="font-display font-bold text-4xl md:text-6xl reveal reveal-delay-1">
+                Häufig gestellte Fragen
+            </h2>
+        </div>
+
+        <div class="reveal reveal-delay-2">
+            <div class="faq-item" data-faq>
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="font-semibold text-lg md:text-xl">Wer kann bei X1 teilnehmen?</span>
+                    <svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p class="leading-relaxed">
+                        Jeder ab 18 Jahren kann teilnehmen. Keine speziellen Vorkenntnisse erforderlich – 
+                        bringen Sie einfach Ihre Neugier und gute Laune mit! Die Fragen decken ein breites 
+                        Spektrum ab: von Allgemeinwissen über Popkultur bis zu speziellen Themenrunden.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq>
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="font-semibold text-lg md:text-xl">Wie hoch sind die Gewinnchancen?</span>
+                    <svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p class="leading-relaxed">
+                        Bei 500 Teilnehmern und mehreren Gewinnrunden pro Abend sind Ihre Chancen 
+                        überraschend gut! Neben dem Hauptjackpot gibt es zahlreiche Zusatzpreise in 
+                        jeder Runde. Viele unserer Gäste gehen mit einem Preis nach Hause.
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq>
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="font-semibold text-lg md:text-xl">Was kostet ein Ticket?</span>
+                    <svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p class="leading-relaxed">
+                        Tickets beginnen bei 49 Euro für Standardplätze. VIP-Pakete mit bevorzugter 
+                        Sitzplatzwahl, Getränken und exklusivem Zugang zum After-Party-Bereich sind 
+                        ab 149 Euro erhältlich. Frühbucher-Rabatte von bis zu 20% verfügbar!
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq>
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="font-semibold text-lg md:text-xl">Finden X1-Events auch in meiner Stadt statt?</span>
+                    <svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p class="leading-relaxed">
+                        Derzeit finden unsere Events in Berlin, München, Hamburg, Köln und Frankfurt 
+                        statt. Wir planen 2025 die Expansion auf weitere Städte. Melden Sie sich für 
+                        unseren Newsletter, um als Erstes von neuen Terminen in Ihrer Nähe zu erfahren!
+                    </p>
+                </div>
+            </div>
+
+            <div class="faq-item" data-faq>
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span class="font-semibold text-lg md:text-xl">Kann ich mein Ticket stornieren oder umbuchen?</span>
+                    <svg class="faq-icon w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                    </svg>
+                </div>
+                <div class="faq-answer">
+                    <p class="leading-relaxed">
+                        Bis 7 Tage vor demEvent können Sie kostenlos stornieren. Danach ist eine 
+                        Umbuchung auf einen späteren Termin gegen eine Gebühr von 15 Euro möglich. 
+                        Bei Krankheit mit ärztlicher Bescheinigung erstatten wir das volle Ticket.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Final CTA Section -->
+<section id="tickets" class="py-32 relative overflow-hidden">
+    <div class="absolute inset-0">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-cyan-500/10"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/10 rounded-full blur-[150px] pulse-glow"></div>
+    </div>
+
+    <div class="max-w-4xl mx-auto px-6 lg:px-12 text-center relative z-10">
+        <div class="reveal">
+            <p class="text-cyan-400 font-medium tracking-[0.3em] text-sm mb-6">BEREIT FÜR X1?</p>
+        </div>
+        
+        <h2 class="font-display font-bold text-4xl md:text-7xl mb-8 reveal reveal-delay-1 leading-tight">
+            Sichern Sie sich<br>Ihren Platz
+        </h2>
+        
+        <p class="text-xl text-white/60 mb-12 max-w-2xl mx-auto reveal reveal-delay-2">
+            Die nächsten Termine sind schnell ausgebucht. Seien Sie dabei, wenn 
+            das Licht erlischt und das Spiel beginnt.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-6 justify-center items-center reveal reveal-delay-3">
+            <button class="btn-primary text-lg px-12 py-5" onclick="alert('Ticket-System würde hier öffnen...')">
+                Jetzt Ticket sicheren
+            </button>
+            <p class="text-white/40 text-sm">Ab 49 EUR · Kostenlos stornierbar bis 7 Tage vorher</p>
+        </div>
+
+        <div class="mt-16 flex flex-wrap justify-center gap-8 text-sm text-white/40 reveal reveal-delay-4">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Sofortige Bestätigung
+            </div>
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Sichere Zahlung
+            </div>
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                Mobile Tickets
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-16 border-t border-white/5">
+    <div class="max-w-7xl mx-auto px-6 lg:px-12">
+        <div class="grid md:grid-cols-4 gap-12 mb-16">
+            <!-- Logo & Description -->
+            <div class="md:col-span-2">
+                <img style="width:120px; height: 28px;"src="https://i.ibb.co.com/mFqSP1hv/X1-Logo-Weiss-Transparent.png">
+              
+                <p class="text-white/50 max-w-sm leading-relaxed">
+                    X1 ist Deutschlands premieres Live-Quiz-Erlebnis. Epische Themenwelten, 
+                    atemberaubende Production und Preise, die verändern.
+                </p>
+            </div>
+
+            <!-- Links -->
+            <div>
+                <h4 class="font-semibold mb-6 text-sm uppercase tracking-wider">Rechtliches</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Impressum</a></li>
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">AGB</a></li>
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Datenschutz</a></li>
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Widerrufsrecht</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h4 class="font-semibold mb-6 text-sm uppercase tracking-wider">Unternehmen</h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Über Uns</a></li>
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Karriere</a></li>
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Presse</a></li>
+                    <li><a href="#" class="text-white/50 hover:text-cyan-400 transition-colors">Kontakt</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-white/30 text-sm">© 2026 X1 Quiz Show.Alle Rechte vorbehalten. Entwickelt von Zannatul.</p>
+            <div class="flex gap-6">
+                <a href="#" class="text-white/30 hover:text-cyan-400 transition-colors" aria-label="Instagram">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                </a>
+                <a href="#" class="text-white/30 hover:text-cyan-400 transition-colors" aria-label="Facebook">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.79-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                </a>
+                <a href="#" class="text-white/30 hover:text-cyan-400 transition-colors" aria-label="YouTube">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </a>
+                <a href="#" class="text-white/30 hover:text-cyan-400 transition-colors" aria-label="TikTok">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // Initialize variables first
+    let currentTestimonial = 0;
+    const totalTestimonials = 3;
+    let trailerPlaying = false;
+
+    // Mobile menu toggle
+    function toggleMobileMenu() {
+        const menu = document.getElementById('mobileMenu');
+        const top = document.getElementById('hamburger-top');
+        const mid = document.getElementById('hamburger-mid');
+        const bot = document.getElementById('hamburger-bot');
+        
+        menu.classList.toggle('active');
+        
+        if (menu.classList.contains('active')) {
+            top.style.transform = 'rotate(45deg) translate(5px, 5px)';
+            mid.style.opacity = '0';
+            bot.style.transform = 'rotate(-45deg) translate(5px, -5px)';
+        } else {
+            top.style.transform = 'none';
+            mid.style.opacity = '1';
+            bot.style.transform = 'none';
+        }
+    }
+
+    // Smooth scroll to section
+    function scrollToSection(id) {
+        const element = document.getElementById(id);
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    // Navbar scroll effect
+    let lastScrollY = window.scrollY;
+    const navbar = document.getElementById('navbar');
+    
+    window.addEventListener('scroll', () => {
+        const currentScrollY = window.scrollY;
+        
+        if (currentScrollY > 100) {
+            navbar.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+            navbar.style.backdropFilter = 'blur(20px)';
+        } else {
+            navbar.style.backgroundColor = 'transparent';
+            navbar.style.backdropFilter = 'none';
+        }
+        
+        lastScrollY = currentScrollY;
+    });
+
+    // Scroll reveal animation
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal').forEach(el => {
+        observer.observe(el);
+    });
+
+    // FAQ Accordion
+    function toggleFaq(element) {
+        const item = element.parentElement;
+        const isActive = item.classList.contains('active');
+        
+        // Close all other FAQs
+        document.querySelectorAll('.faq-item').forEach(faq => {
+            faq.classList.remove('active');
+        });
+        
+        // Toggle current
+        if (!isActive) {
+            item.classList.add('active');
+        }
+    }
+
+    // Testimonial Carousel
+    function updateCarousel() {
+        const track = document.getElementById('testimonialTrack');
+        const dots = document.querySelectorAll('#carouselDots button');
+        
+        track.style.transform = `translateX(-${currentTestimonial * 100}%)`;
+        
+        dots.forEach((dot, index) => {
+            if (index === currentTestimonial) {
+                dot.classList.remove('bg-white/30');
+                dot.classList.add('bg-cyan-400');
+            } else {
+                dot.classList.remove('bg-cyan-400');
+                dot.classList.add('bg-white/30');
+            }
+        });
+    }
+
+    function nextTestimonial() {
+        currentTestimonial = (currentTestimonial + 1) % totalTestimonials;
+        updateCarousel();
+    }
+
+    function prevTestimonial() {
+        currentTestimonial = (currentTestimonial - 1 + totalTestimonials) % totalTestimonials;
+        updateCarousel();
+    }
+
+    // Dot click handlers
+    document.querySelectorAll('#carouselDots button').forEach((dot, index) => {
+        dot.addEventListener('click', () => {
+            currentTestimonial = index;
+            updateCarousel();
+        });
+    });
+
+    // Auto-advance carousel
+    setInterval(nextTestimonial, 6000);
+
+    // Video Player
+    const trailerVideo = document.getElementById('trailerVideo');
+    const playOverlay = document.getElementById('playOverlay');
+    const videoControls = document.getElementById('videoControls');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const progressBar = document.getElementById('progressBar');
+    const timeDisplay = document.getElementById('timeDisplay');
+
+    function toggleTrailer() {
+        if (trailerPlaying) {
+            trailerVideo.pause();
+            playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+            playOverlay.style.opacity = '1';
+        } else {
+            trailerVideo.play();
+            playPauseIcon.innerHTML = '<path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>';
+            playOverlay.style.opacity = '0';
+        }
+        trailerPlaying = !trailerPlaying;
+    }
+
+    trailerVideo.addEventListener('timeupdate', () => {
+        const progress = (trailerVideo.currentTime / trailerVideo.duration) * 100;
+        progressBar.style.width = progress + '%';
+        
+        const currentMin = Math.floor(trailerVideo.currentTime / 60);
+        const currentSec = Math.floor(trailerVideo.currentTime % 60).toString().padStart(2, '0');
+        const durationMin = Math.floor(trailerVideo.duration / 60) || 0;
+        const durationSec = Math.floor(trailerVideo.duration % 60 || 0).toString().padStart(2, '0');
+        
+        timeDisplay.textContent = `${currentMin}:${currentSec} / ${durationMin}:${durationSec}`;
+    });
+
+    trailerVideo.addEventListener('ended', () => {
+        trailerPlaying = false;
+        playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+        playOverlay.style.opacity = '1';
+    });
+
+    function seekVideo(event) {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const percent = (event.clientX - rect.left) / rect.width;
+        trailerVideo.currentTime = percent * trailerVideo.duration;
+    }
+
+    // Show controls on hover
+    const trailerContainer = document.getElementById('trailerContainer');
+    trailerContainer.addEventListener('mouseenter', () => {
+        if (trailerPlaying) {
+            videoControls.style.opacity = '1';
+        }
+    });
+    trailerContainer.addEventListener('mouseleave', () => {
+        if (trailerPlaying) {
+            videoControls.style.opacity = '0';
+        }
+    });
+
+    // Answer buttons interaction
+    document.querySelectorAll('.step-card .grid > div').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Reset all
+            document.querySelectorAll('.step-card .grid > div').forEach(b => {
+                b.classList.remove('bg-cyan-500/20', 'border-cyan-400');
+                b.classList.add('bg-white/5', 'border-white/10');
+            });
+            // Highlight selected
+            this.classList.remove('bg-white/5', 'border-white/10');
+            this.classList.add('bg-cyan-500/20', 'border-cyan-400');
+        });
+    });
+
+    // Parallax effect for floating elements
+    let ticking = false;
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            window.requestAnimationFrame(() => {
+                const scrolled = window.scrollY;
+                document.querySelectorAll('.parallax-slow').forEach(el => {
+                    const speed = el.dataset.speed || 0.5;
+                    el.style.transform = `translateY(${scrolled * speed}px)`;
+                });
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+
+    // Keyboard navigation for FAQ
+    document.querySelectorAll('.faq-question').forEach(question => {
+        question.setAttribute('tabindex', '0');
+        question.setAttribute('role', 'button');
+        question.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleFaq(question);
+            }
+        });
+    });
+
+    // Initialize - trigger visible reveals immediately
+    setTimeout(() => {
+        document.querySelectorAll('.reveal').forEach(el => {
+            const rect = el.getBoundingClientRect();
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                el.classList.add('active');
+            }
+        });
+    }, 100);
+</script>
+
+</body>
+</html>
